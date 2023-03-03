@@ -29,6 +29,11 @@ public class AvocadoEnemy : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-            rotateCover180();
+            
+    }
+
+    private void FixedUpdate()
+    {
+        rotateCover180();
     }
 }
