@@ -1,8 +1,7 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using Unity.XR.CoreUtils;
+using UnityEngine.UI;
 
 [RequireComponent(typeof(Rigidbody))]
 
@@ -19,6 +18,11 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private float jumpForce = 500f;
     [SerializeField] private float flightForce = 5f;
     [SerializeField] private float drainPerSecond  = 5f;
+    [SerializeField] private GameObject healthS;
+    [SerializeField] private GameObject energyS;
+
+    private Slider healthSlider;
+    private Slider energySlider;
 
     private Rigidbody _body;
     private bool IsGrounded => Physics.Raycast(
@@ -40,14 +44,18 @@ public class PlayerController : MonoBehaviour
         _xrRig = GetComponent<XROrigin>();
         jumpactionReference.action.performed += OnJump;
         startFlying = Time.time;
+        healthSlider = healthS.GetComponent<Slider>();
+        energySlider = energyS.GetComponent<Slider>();
+        healthSlider.value = (float)health;
+        energySlider.value = (float)energy;
     }
 
     // Update is called once per frame
-    void Update()
+    void FixedUpdate()
     {
         var center = _xrRig.CameraInOriginSpacePos;
-        _collider.center = new Vector3(center.x, _collider.center.y, center.z);
-        _collider.height = _xrRig.CameraInOriginSpaceHeight;
+        _collider.height = Mathf.Clamp(_xrRig.CameraInOriginSpaceHeight, 1.0f, 3.0f);
+        _collider.center = new Vector3(center.x, _collider.height / 2, center.z);
 
         if (flyingLastFrame)
         {
@@ -62,6 +70,7 @@ public class PlayerController : MonoBehaviour
         }
         if (flightActionReference1.action.IsPressed() & flightActionReference2.action.IsPressed()  && (health  >  0 &&  energy > 0))
         {
+            print("FLY");
             controller1Dir = directionProperty1.action.ReadValue<Quaternion>()* Vector3.forward;
             controller2Dir = directionProperty2.action.ReadValue<Quaternion>() * Vector3.forward;
             Vector3 movementDir = controller1Dir + controller2Dir;
@@ -79,16 +88,17 @@ public class PlayerController : MonoBehaviour
 
     private void OnJump(InputAction.CallbackContext obj)
     {
+        _body.WakeUp();
         if (!IsGrounded) return;
+        print("JUMP");
         _body.AddForce(Vector3.up * jumpForce);
-        print(obj.duration);
     }
 
     public  void drainHP(double amt)
     {
         health -= amt;
         if (health < 0) health = 0;
-
+        healthSlider.value = (float)health;
     }
 
     public bool drainStamina(double amt)
@@ -96,8 +106,10 @@ public class PlayerController : MonoBehaviour
         if(energy - amt > 0)
         {
             energy -= amt;
+            energySlider.value = (float)energy;
             return true;
         }
+        energySlider.value = (float)energy;
         return false;
     }
 
