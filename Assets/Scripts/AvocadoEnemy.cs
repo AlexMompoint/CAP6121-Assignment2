@@ -28,7 +28,6 @@ public class AvocadoEnemy : MonoBehaviour
     bool rotateCover180()
     {
         cover.transform.RotateAround(center.position, Vector3.up, (closed) ? rotateSpeed  : rotateSpeed * -1);
-        Debug.Log($"{cover.transform.eulerAngles}");
         if(cover.transform.localEulerAngles.y > 359.0f)
         {
             return true;
@@ -49,7 +48,8 @@ public class AvocadoEnemy : MonoBehaviour
         {
             lastSpawn = Time.time;
             int RandomNum = Random.Range(0, 5);
-            Instantiate(prefab, spawns[RandomNum].position, transform.rotation);
+            GameObject clone = Instantiate(prefab, spawns[RandomNum].position, transform.rotation);
+            clone.GetComponent<StrawberryEnemy>().target = target ;
         } else if(!closed && !changing) {
             Transform tempRot = transform;
             tempRot.LookAt(target, Vector3.up);
@@ -62,7 +62,6 @@ public class AvocadoEnemy : MonoBehaviour
     {
         if(changing && rotateCover180())
         {
-            Debug.Log("Swapped");
             closed ^= true;
             nextSwap = Time.time + idleTime;
             changing = false;

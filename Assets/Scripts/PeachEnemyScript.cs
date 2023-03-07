@@ -33,4 +33,12 @@ public class PeachEnemyScript : MonoBehaviour
             transform.LookAt(target.position);
         }
     }
+
+    private void OnTriggerEnter(Collider other)
+    {
+        if(other.name == "Blade" || other.name == "Tip" || other.name == "Shuriken")
+        {
+            Destroy(transform.parent.gameObject);
+        }
+    }
 }

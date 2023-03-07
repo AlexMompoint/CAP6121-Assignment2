@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class RotatingBananaCollide : MonoBehaviour
+public class AvacadoWeakSpot : MonoBehaviour
 {
     // Start is called before the first frame update
     void Start()
@@ -16,9 +16,11 @@ public class RotatingBananaCollide : MonoBehaviour
         
     }
 
-    private void OnCollisionEnter(Collision collision)
+    private void OnTriggerEnter(Collider other)
     {
-        if(collision.gameObject.name != "banana")
-            GetComponentInParent<BananaEnemy>().cw ^= true;
+        if( other.name == "Tip" || other.name == "Shuriken")
+        {
+            Destroy(transform.parent.gameObject);
+        }
     }
 }
